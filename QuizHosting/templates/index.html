@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Trivia Bot - The Ultimate Discord Trivia Experience!</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #7289DA;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+        }
+        nav {
+            background-color: #2C2F33;
+            color: white;
+            padding: 0.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+        }
+        nav ul li {
+            margin: 0 15px;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+        nav ul li a:hover {
+            color: #7289DA;
+        }
+        .main-content {
+            background-color: white;
+            padding: 30px;
+            margin-top: 20px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+        .section {
+            margin-bottom: 40px;
+        }
+        h1, h2 {
+            color: #7289DA;
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        h2 {
+            border-bottom: 2px solid #7289DA;
+            padding-bottom: 10px;
+            font-size: 1.8em;
+        }
+        .flex-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+        .flex-item {
+            flex: 1;
+            min-width: 300px;
+            padding: 0 15px;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        img:hover {
+            transform: scale(1.05);
+        }
+        footer {
+            background-color: #23272A;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            margin-top: 20px;
+        }
+        footer a {
+            color: #7289DA;
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+        .cta-button {
+            display: inline-block;
+            background-color: #7289DA;
+            color: white;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            margin: 20px 0;
+        }
+        .cta-button:hover {
+            background-color: #5865F2;
+        }
+        .cta-container {
+            text-align: center;
+            margin: 40px 0;
+        }
+        @media (max-width: 768px) {
+            .flex-container {
+                flex-direction: column;
+            }
+            .flex-item {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Ultimate Trivia Bot</h1>
+        <p>The Ultimate Discord Trivia Experience!</p>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#key-features">Features</a></li>
+            <li><a href="#bot-commands">Commands</a></li>
+            <li><a href="#about-the-bot">About</a></li>
+            <li><a href="{{ url_for('terms_of_service') }}">Terms of Service</a></li>
+            <li><a href="{{ url_for('privacy_policy') }}">Privacy Policy</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <main class="main-content">
+            <div class="cta-container">
+                <a href="https://top.gg/bot/1282093835156979816/invite" class="cta-button">Add Bot to Your Server</a>
+            </div>
+
+            <section id="key-features" class="section">
+                <h2>Key Features</h2>
+                <ul>
+                    <li>Over 5,000 unique trivia questions</li>
+                    <li>20+ categories, from anime to science</li>
+                    <li>Daily challenges and global leaderboard</li>
+                    <li>Detailed stats</li>
+                    <li>Interactive interface</li>
+                </ul>
+            </section>
+
+            <section id="bot-commands" class="section">
+                <h2>Bot Commands</h2>
+                <p>Easily control the Ultimate Trivia Bot with the following commands:</p>
+                <ul>
+                    <li><strong>/quiz</strong> -- Start a new quiz game</li>
+                    <li><strong>/leaderboard</strong> -- View the global leaderboard</li>
+                    <li><strong>/profile</strong> -- See anyone's stats</li>
+                    <li><strong>/daily_quiz</strong> -- Participate in the daily challenge</li>
+                    <li><strong>/help</strong> -- Get help with the bot</li>
+                </ul>
+            </section>
+
+            <section id="about-the-bot" class="section">
+                <div class="flex-container">
+                    <div class="flex-item">
+                        <h2>About the Bot</h2>
+                        <p>Participate in daily challenges, explore over 20 diverse categories, and compete on the global leaderboard. With difficulties ranging from easy to hard, there's something for everyone. Play to become the trivia master you were always meant to be!</p>
+                    </div>
+                    <div class="flex-item">
+                        <img src="{{ url_for('static', filename='image4.jpg') }}" alt="Quiz UI">
+                    </div>
+                </div>
+            </section>
+
+            <section id="create-custom-quizzes" class="section">
+                <div class="flex-container">
+                    <div class="flex-item">
+                        <img src="{{ url_for('static', filename='image3.jpg') }}" alt="Custom Quiz">
+                    </div>
+                    <div class="flex-item">
+                        <h2>Create Custom Quizzes</h2>
+                        <p>Create your own trivia quizzes, tailor-made for your community or friends. You decide the categories, difficulty, and time limit for the ultimate custom experience.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="interactive-leaderboard" class="section">
+                <div class="flex-container">
+                    <div class="flex-item">
+                        <h2>Interactive Leaderboard</h2>
+                        <p>Compete with friends and players worldwide in our interactive leaderboard. Track your position and aim for the top!</p>
+                    </div>
+                    <div class="flex-item">
+                        <img src="{{ url_for('static', filename='image1.jpg') }}" alt="Leaderboard">
+                    </div>
+                </div>
+            </section>
+
+            <section id="detailed-player-stats" class="section">
+                <div class="flex-container">
+                    <div class="flex-item">
+                        <img src="{{ url_for('static', filename='image2.jpg') }}" alt="Player Stats">
+                    </div>
+                    <div class="flex-item">
+                        <h2>Detailed Player Stats</h2>
+                        <p>Dive deep into player profiles and stats, showing accuracy, strengths, and areas for improvement. Become a trivia master by refining your knowledge.</p>
+                    </div>
+                </div>
+            </section>
+
+            <div class="cta-container">
+                <a href="https://top.gg/bot/1282093835156979816/invite" class="cta-button">Add Ultimate Trivia Bot to Your Server Now!</a>
+            </div>
+        </main>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Ultimate Trivia Bot. All rights reserved. | <a href="{{ url_for('terms_of_service') }}">Terms of Service</a> | <a href="{{ url_for('privacy_policy') }}">Privacy Policy</a></p>
+    </footer>
+</body>
+</html>

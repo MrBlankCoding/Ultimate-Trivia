@@ -1,0 +1,8 @@
+discord.py
+flask
+aiofiles
+pymongo
+motor
+asyncio-redis
+redis
+topggpy
