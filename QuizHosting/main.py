@@ -212,6 +212,7 @@ class QuizBot(commands.Bot):
         self.redis = redis.Redis(host='redis-16642.c16.us-east-1-2.ec2.redns.redis-cloud.com', port=16642, password=REDIS_PASSWORD)
         self.client = AsyncIOMotorClient(mongo_uri)
         self.db = self.client['ultimate_trivia']
+        self.topgg_client = None
         self.leaderboard_cache = {}
         self.rank_cache = {}
         
@@ -232,7 +233,7 @@ class QuizBot(commands.Bot):
         await self.start_background_tasks()
 
     async def init_topgg_client(self):
-        self.topgg_client = topgg.DBLClient(self, WEBHOOK_PASSWORD, autopost=True)
+        self.topgg_client = topgg.DBLClient(self, os.environ['TOPGG_TOKEN'], autopost=True)
 
     async def start_background_tasks(self):
         self.check_weekly_reset.start()
@@ -258,6 +259,7 @@ class QuizBot(commands.Bot):
             user_profile.powerups[powerup] += 1
             powerups_added[powerup] += 1
 
+        user_profile.last_upvote_date = datetime.utcnow()  # This will be stored directly in MongoDB
         await self.save_user_profile(user_profile)
 
         return {
@@ -268,7 +270,7 @@ class QuizBot(commands.Bot):
         
     @tasks.loop(minutes=5)
     async def check_upvotes(self):
-        current_time = datetime.now()
+        current_time = datetime.utcnow()
         twelve_hours_ago = current_time - timedelta(hours=12)
 
         async for upvote_record in self.db.upvotes.find({'last_upvote': {'$lt': twelve_hours_ago}}):
@@ -280,7 +282,7 @@ class QuizBot(commands.Bot):
                 
     @tasks.loop(hours=1)
     async def upvote_reminder(self):
-        current_time = datetime.now()
+        current_time = datetime.utcnow()
         twelve_hours_ago = current_time - timedelta(hours=12)
 
         async for user_profile in self.db.user_profiles.find({'notifications_enabled': True}):
