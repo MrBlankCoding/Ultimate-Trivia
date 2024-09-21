@@ -1268,7 +1268,7 @@ async def daily_quiz(interaction: discord.Interaction):
         daily_category = await bot.get_daily_category()
 
         # Fetch 5 questions from the daily category
-        api_questions = await fetch_questions(daily_category, 5, "random")
+        api_questions = await fetch_questions(daily_category, 5, "easy")
         
         if not api_questions:
             await interaction.followup.send("We're having issues fetching questions. Please try again later.")
