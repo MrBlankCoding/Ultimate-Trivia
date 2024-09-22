@@ -1743,7 +1743,7 @@ async def on_ready():
 
 if __name__ == "__main__":
     # Start the webhook server in a separate thread
-    webhook_thread = threading.Thread(target=start_webhook_server, args=(bot,))
+    webhook_thread = threading.Thread(target=run_webhook_server, args=(bot,))
     webhook_thread.start()
 
     # Start the bot
