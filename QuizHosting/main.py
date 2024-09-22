@@ -21,7 +21,6 @@ import redis.asyncio as redis
 import topgg
 
 # Project-specific imports
-from webserver import run_webhook_server
 from shared import set_bot
 from asyncio import Lock
 
