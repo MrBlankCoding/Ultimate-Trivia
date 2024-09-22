@@ -1,25 +1,29 @@
-import aiohttp
-import redis.asyncio as redis
+# Standard library imports
 import asyncio
 import base64
 import os
 import random
 import time as time_module
-from datetime import datetime, time, timedelta
-from typing import Dict, List, Optional, Tuple, Union, Any, Set
 from contextlib import asynccontextmanager
+from datetime import datetime, time, timedelta
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
+import threading
+import html
 
+# Third-party library imports
+import aiohttp
 import discord
 from discord import app_commands
 from discord.ext import commands, tasks
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo import UpdateOne
+import redis.asyncio as redis
+import topgg
 
-import html
+# Project-specific imports
 from webserver import start_webhook_server
 from asyncio import Lock
-import threading
-import topgg
+
 
 DISCORD_TOKEN = os.environ['key']
 WEBHOOK_PASSWORD = os.environ['key2']
