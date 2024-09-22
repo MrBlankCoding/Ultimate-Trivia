@@ -28,6 +28,7 @@ from asyncio import Lock
 DISCORD_TOKEN = os.environ['key']
 WEBHOOK_PASSWORD = os.environ['key2']
 REDIS_PASSWORD = os.environ['key3']
+TOPGG = os.environ['key4']
 
 #this guy
 USERS_PER_PAGE = 10
@@ -237,7 +238,7 @@ class QuizBot(commands.Bot):
         await self.start_background_tasks()
 
     async def init_topgg_client(self):
-        self.topgg_client = topgg.DBLClient(self, os.environ['TOPGG_TOKEN'], autopost=True)
+        self.topgg_client = topgg.DBLClient(self, TOPGG, autopost=True)
 
     async def start_background_tasks(self):
         self.check_weekly_reset.start()

@@ -94,7 +94,8 @@ def test():
     return 'Webhook server is running', 200
 
 def run():
-    app.run(host="0.0.0.0", port=5001)
+    app.run(host="0.0.0.0", port=5000, debug=True)
+    print(app.url_map)
 
 def keep_alive():
     t = threading.Thread(target=run)
