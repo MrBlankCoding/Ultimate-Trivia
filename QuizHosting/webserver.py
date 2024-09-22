@@ -1,6 +1,7 @@
 import traceback
-from flask import Flask, request, abort, render_template
+from flask import Flask, request, abort, render_template, send_file
 import asyncio
+import logging
 import discord
 from datetime import datetime
 import os
@@ -9,6 +10,10 @@ from shared import app, bot
 
 app = Flask('')
 bot = None  # Global variable to store the bot instance
+
+# Configure logging
+log_file = 'console.log'
+logging.basicConfig(filename=log_file, level=logging.INFO)
 
 @app.route('/')
 def home():
@@ -101,6 +106,14 @@ async def send_upvote_confirmation(user_id: str, powerup_result: dict):
 @app.route('/test', methods=['GET'])
 def test():
     return 'Webhook server is running', 200
+
+@app.route('/console', methods=['GET'])
+def console():
+    # Return the log file for download
+    if os.path.exists(log_file):
+        return send_file(log_file, as_attachment=True)
+    else:
+        return 'Log file not found', 404
 
 def run():
     app.run(host="0.0.0.0", port=5000, debug=True)
