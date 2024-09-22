@@ -21,6 +21,7 @@ import redis.asyncio as redis
 import topgg
 
 # Project-specific imports
+from webserver import run_webhook_server
 from shared import set_bot
 from asyncio import Lock
 
@@ -248,14 +249,10 @@ class QuizBot(commands.Bot):
         self.check_upvotes.start()
         self.upvote_reminder.start()
         
-    async def add_random_powerups(self, user_id):
+    async def add_random_powerups(self, user_id: str) -> dict:
         user_profile = await self.get_user_profile(user_id)
         powerup_types = list(user_profile.powerups.keys())
         
-        if 'upvote_count' not in user_profile.__dict__:
-            user_profile.upvote_count = 0
-        
-        user_profile.upvote_count += 1
         bonus_powerups = min(user_profile.upvote_count // 5, 5)
         
         powerups_added = {powerup: 0 for powerup in powerup_types}
@@ -263,9 +260,6 @@ class QuizBot(commands.Bot):
             powerup = random.choice(powerup_types)
             user_profile.powerups[powerup] += 1
             powerups_added[powerup] += 1
-
-        user_profile.last_upvote_date = datetime.utcnow()  # This will be stored directly in MongoDB
-        await self.save_user_profile(user_profile)
 
         return {
             'upvote_count': user_profile.upvote_count,
@@ -545,18 +539,32 @@ class QuizBot(commands.Bot):
             rank = await self.redis.zrevrank(f"leaderboard:{tier}", user_id)
             return rank + 1 if rank is not None else None
 
-    async def get_user_profile(self, user_id: str) -> UserProfile:
-        user_data = await self.db.user_profiles.find_one({"user_id": user_id})
+
+    async def get_user_profile(self, user_id: str) -> Optional[UserProfile]:
+        # Check cache first
+        if user_id in self.user_profiles:
+            return self.user_profiles[user_id]
+
+        # If not in cache, fetch from database
+        user_data = await self.user_profiles_collection.find_one({"user_id": user_id})
         if user_data:
-            return await UserProfile.from_dict(user_data)
+            user_profile = await UserProfile.from_dict(user_data)
+            self.user_profiles[user_id] = user_profile
+            return user_profile
         return None
+    
+    async def create_user_profile(self, user_id: str) -> UserProfile:
+        user_profile = UserProfile(user_id)
+        await self.save_user_profile(user_profile)
+        return user_profile
 
     async def save_user_profile(self, user_profile: UserProfile):
-        await self.db.user_profiles.update_one(
+        await self.user_profiles_collection.update_one(
             {"user_id": user_profile.user_id},
             {"$set": user_profile.to_dict()},
             upsert=True
         )
+        self.user_profiles[user_profile.user_id] = user_profile
         
     @tasks.loop(time=time(hour=0, minute=0))  # Run at midnight
     async def daily_category_reset(self):
