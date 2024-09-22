@@ -546,23 +546,17 @@ class QuizBot(commands.Bot):
             return rank + 1 if rank is not None else None
 
     async def get_user_profile(self, user_id: str) -> UserProfile:
-        async with self.leaderboard_context():
-            if user_id not in self.user_profiles:
-                user_data = await self.user_profiles_collection.find_one({"_id": user_id})
-                if user_data:
-                    self.user_profiles[user_id] = await UserProfile.from_dict(user_data)
-                else:
-                    self.user_profiles[user_id] = UserProfile(user_id)
-            return self.user_profiles[user_id]
+        user_data = await self.db.user_profiles.find_one({"user_id": user_id})
+        if user_data:
+            return await UserProfile.from_dict(user_data)
+        return None
 
     async def save_user_profile(self, user_profile: UserProfile):
-        async with self.leaderboard_context():
-            self.user_profiles[user_profile.user_id] = user_profile
-            await self.user_profiles_collection.update_one(
-                {"_id": user_profile.user_id},
-                {"$set": user_profile.to_dict()},
-                upsert=True
-            )
+        await self.db.user_profiles.update_one(
+            {"user_id": user_profile.user_id},
+            {"$set": user_profile.to_dict()},
+            upsert=True
+        )
         
     @tasks.loop(time=time(hour=0, minute=0))  # Run at midnight
     async def daily_category_reset(self):
