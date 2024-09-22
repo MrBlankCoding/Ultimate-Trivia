@@ -40,6 +40,7 @@ async def dbl_webhook():
         data = request.json
         user_id = str(data['user'])
         app.logger.info(f"Received upvote from user {user_id}")
+        print(f"Received upvote from user {user_id}")
 
         # Process the upvote asynchronously
         asyncio.create_task(process_upvote(user_id))
