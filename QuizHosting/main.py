@@ -21,7 +21,8 @@ import redis.asyncio as redis
 import topgg
 
 # Project-specific imports
-from webserver import start_webhook_server
+from webserver import run_webhook_server
+from shared import set_bot
 from asyncio import Lock
 
 
@@ -626,6 +627,7 @@ class WeeklyLeaderboard:
         self.last_reset = datetime.now()
         
 bot = QuizBot()
+set_bot(bot)
 
 def decode_base64(text: str) -> str:
     """Decode base64 encoded text and then decode HTML entities."""
@@ -1734,7 +1736,7 @@ async def on_ready():
 
 if __name__ == "__main__":
     # Start the webhook server in a separate thread
-    webhook_thread = threading.Thread(target=start_webhook_server, args=(bot,))
+    webhook_thread = threading.Thread(target=run_webhook_server)
     webhook_thread.start()
 
     # Start the bot

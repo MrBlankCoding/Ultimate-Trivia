@@ -5,7 +5,7 @@ import discord
 from datetime import datetime
 import os
 import threading
-from main import QuizBot, UserProfile
+from shared import app, bot
 
 app = Flask('')
 bot = None  # Global variable to store the bot instance
