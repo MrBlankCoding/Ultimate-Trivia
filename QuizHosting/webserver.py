@@ -1,19 +1,32 @@
-import traceback
-from flask import Flask, request, abort, render_template, send_file
-import asyncio
-import logging
-import discord
-from datetime import datetime
 import os
 import threading
+import logging
+import traceback
+from datetime import datetime
+
+import asyncio
+from flask import Flask, request, abort, render_template, send_file
+from flask_cors import CORS
+from werkzeug.middleware.proxy_fix import ProxyFix
+
+import discord
+from discord.ext import commands
+
 from shared import app, bot
 
-app = Flask('')
-bot = None  # Global variable to store the bot instance
+
+app = Flask(__name__)
+CORS(app)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
 # Configure logging
-log_file = 'console.log'
-logging.basicConfig(filename=log_file, level=logging.INFO)
+logging.basicConfig(filename='console.log', level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Discord bot setup
+bot = None
+
+WEBHOOK_PASSWORD = os.environ.get('key2')
 
 @app.route('/')
 def home():
@@ -27,32 +40,23 @@ def terms_of_service():
 def privacy_policy():
     return render_template("privacy-policy.html")
 
-
-WEBHOOK_PASSWORD = os.environ['key2']
-
-def run_webhook_server(bot_instance):
-    global bot
-    bot = bot_instance
-    app.run(host="0.0.0.0", port=5000)
-
 @app.route('/dblwebhook', methods=['POST'])
-async def dbl_webhook():
+def dbl_webhook():
     try:
         if request.headers.get('Authorization') != WEBHOOK_PASSWORD:
-            app.logger.error("Unauthorized webhook attempt")
+            logger.error("Unauthorized webhook attempt")
             abort(401)
-
+        
         data = request.json
         user_id = str(data['user'])
-        app.logger.info(f"Received upvote from user {user_id}")
-        print(f"Received upvote from user {user_id}")
-
-        # Process the upvote asynchronously
-        asyncio.create_task(process_upvote(user_id))
-
+        logger.info(f"Received upvote from user {user_id}")
+        
+        # Use asyncio to run the asynchronous function
+        asyncio.run(process_upvote(user_id))
+        
         return '', 200
     except Exception as e:
-        app.logger.error(f"Error processing webhook: {str(e)}")
+        logger.error(f"Error processing webhook: {str(e)}")
         return 'Internal Server Error', 500
 
 async def process_upvote(user_id: str):
@@ -60,25 +64,22 @@ async def process_upvote(user_id: str):
         # Get or create user profile
         user_profile = await bot.get_user_profile(user_id)
         if user_profile is None:
-            app.logger.warning(f"User {user_id} not found in database. Creating new profile.")
+            logger.warning(f"User {user_id} not found in database. Creating new profile.")
             user_profile = await bot.create_user_profile(user_id)
-
+        
         # Update upvote information
-        now = datetime.utcnow()
-        user_profile.last_upvote_date = now
-        user_profile.upvote_count += 1
-
+        user_profile.update_upvote()
+        
         # Add random powerups
         powerup_result = await bot.add_random_powerups(user_id)
-
+        
         # Update the database
         await bot.save_user_profile(user_profile)
-
+        
         # Send confirmation message to user
         await send_upvote_confirmation(user_id, powerup_result)
-
     except Exception as e:
-        app.logger.error(f"Error processing upvote for user {user_id}: {str(e)}")
+        logger.error(f"Error processing upvote for user {user_id}: {str(e)}")
 
 async def send_upvote_confirmation(user_id: str, powerup_result: dict):
     embed = discord.Embed(
@@ -109,16 +110,13 @@ def test():
 
 @app.route('/console', methods=['GET'])
 def console():
-    # Return the log file for download
-    if os.path.exists(log_file):
-        return send_file(log_file, as_attachment=True)
+    if os.path.exists('console.log'):
+        return send_file('console.log', as_attachment=True)
     else:
         return 'Log file not found', 404
 
-def run():
-    app.run(host="0.0.0.0", port=5000, debug=True)
-    print(app.url_map)
+def run_webhook_server():
+    app.run(host="0.0.0.0", port=5000)
 
-def keep_alive():
-    t = threading.Thread(target=run)
-    t.start()
+if __name__ == "__main__":
+    run_webhook_server()
