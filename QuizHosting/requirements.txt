@@ -6,3 +6,4 @@ motor
 asyncio-redis
 redis
 topggpy
+Flask-Cors
