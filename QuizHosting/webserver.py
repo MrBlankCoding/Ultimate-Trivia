@@ -11,7 +11,6 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 
 import discord
 from discord.ext import commands
-from main import QuizBot
 from main import send_upvote_confirmation, process_upvote
 
 
@@ -22,9 +21,6 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 # Configure logging
 logging.basicConfig(filename='console.log', level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-# Discord bot setup
-bot = QuizBot()
 
 WEBHOOK_PASSWORD = os.environ.get('key2')
 
