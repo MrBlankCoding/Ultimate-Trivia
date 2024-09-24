@@ -11,7 +11,6 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 
 import discord
 from discord.ext import commands
-from main import send_upvote_confirmation, process_upvote
 
 
 app = Flask(__name__)
@@ -38,6 +37,7 @@ def privacy_policy():
 
 @app.route('/dblwebhook', methods=['POST'])
 def dbl_webhook():
+    from main import send_upvote_confirmation, process_upvote
     try:
         if request.headers.get('Authorization') != WEBHOOK_PASSWORD:
             logger.error("Unauthorized webhook attempt")
