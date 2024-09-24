@@ -47,13 +47,19 @@ def dbl_webhook():
         user_id = str(data['user'])
         logger.info(f"Received upvote from user {user_id}")
         
-        # Use asyncio to run the asynchronous function in the background
-        asyncio.create_task(process_upvote(user_id))
+        # Check if there is an existing event loop and run accordingly
+        try:
+            loop = asyncio.get_running_loop()
+            # If we are already in an event loop, we create a task
+            loop.create_task(process_upvote(user_id))
+        except RuntimeError:  # No event loop exists, so we create one
+            asyncio.run(process_upvote(user_id))
         
         return '', 200
     except Exception as e:
-        logger.error(f"Error processing webhook: {str(e)}")
+        logger.error(f"Error processing webhook: {traceback.format_exc()}")
         return 'Internal Server Error', 500
+
 
 @app.route('/test', methods=['GET'])
 def test():
