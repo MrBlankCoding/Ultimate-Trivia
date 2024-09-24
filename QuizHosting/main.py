@@ -633,7 +633,6 @@ class WeeklyLeaderboard:
         self.last_reset = datetime.now()
         
 bot = QuizBot()
-set_bot(bot)
 
 def decode_base64(text: str) -> str:
     """Decode base64 encoded text and then decode HTML entities."""
