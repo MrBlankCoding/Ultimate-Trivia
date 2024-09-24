@@ -13,6 +13,7 @@ import discord
 from discord.ext import commands
 
 from shared import app, bot
+from main import QuizBot
 
 
 app = Flask(__name__)
@@ -24,7 +25,7 @@ logging.basicConfig(filename='console.log', level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Discord bot setup
-bot = None
+bot = QuizBot()
 
 WEBHOOK_PASSWORD = os.environ.get('key2')
 
@@ -51,13 +52,14 @@ def dbl_webhook():
         user_id = str(data['user'])
         logger.info(f"Received upvote from user {user_id}")
         
-        # Use asyncio to run the asynchronous function
-        asyncio.run(process_upvote(user_id))
+        # Use asyncio to run the asynchronous function in the background
+        asyncio.create_task(process_upvote(user_id))
         
         return '', 200
     except Exception as e:
         logger.error(f"Error processing webhook: {str(e)}")
         return 'Internal Server Error', 500
+
 
 async def process_upvote(user_id: str):
     try:
