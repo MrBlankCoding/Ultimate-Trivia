@@ -12,6 +12,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 import discord
 from discord.ext import commands
 from main import QuizBot
+from main import send_upvote_confirmation, process_upvote
 
 
 app = Flask(__name__)
