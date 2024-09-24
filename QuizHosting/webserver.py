@@ -11,8 +11,6 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 
 import discord
 from discord.ext import commands
-
-from shared import app, bot
 from main import QuizBot
 
 
@@ -59,52 +57,6 @@ def dbl_webhook():
     except Exception as e:
         logger.error(f"Error processing webhook: {str(e)}")
         return 'Internal Server Error', 500
-
-
-async def process_upvote(user_id: str):
-    try:
-        # Get or create user profile
-        user_profile = await bot.get_user_profile(user_id)
-        if user_profile is None:
-            logger.warning(f"User {user_id} not found in database. Creating new profile.")
-            user_profile = await bot.create_user_profile(user_id)
-        
-        # Update upvote information
-        user_profile.update_upvote()
-        
-        # Add random powerups
-        powerup_result = await bot.add_random_powerups(user_id)
-        
-        # Update the database
-        await bot.save_user_profile(user_profile)
-        
-        # Send confirmation message to user
-        await send_upvote_confirmation(user_id, powerup_result)
-    except Exception as e:
-        logger.error(f"Error processing upvote for user {user_id}: {str(e)}")
-
-async def send_upvote_confirmation(user_id: str, powerup_result: dict):
-    embed = discord.Embed(
-        title="Thanks for Upvoting!",
-        description=f"You've received {powerup_result['total_powerups']} powerups!",
-        color=discord.Color.green()
-    )
-    embed.add_field(name="Upvote Streak", value=f"{powerup_result['upvote_count']} day{'s' if powerup_result['upvote_count'] > 1 else ''}")
-
-    powerups_text = "\n".join([f"{name.replace('_', ' ').title()}: {count}" for name, count in powerup_result['powerups_added'].items() if count > 0])
-    embed.add_field(name="Powerups Received", value=powerups_text, inline=False)
-
-    embed.set_footer(text="Keep voting daily for bonus powerups!")
-
-    user = bot.get_user(int(user_id))
-    if user:
-        try:
-            await user.send(embed=embed)
-            app.logger.info(f"Sent upvote confirmation to user {user_id}")
-        except discord.errors.Forbidden:
-            app.logger.warning(f"Unable to send DM to user {user_id}")
-    else:
-        app.logger.warning(f"Unable to find Discord user {user_id}")
 
 @app.route('/test', methods=['GET'])
 def test():
